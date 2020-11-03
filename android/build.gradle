@@ -35,7 +35,7 @@ android {
         main.proto.srcDirs += '../protos'
     }
     defaultConfig {
-        minSdkVersion 23
+        minSdkVersion 21
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
@@ -69,7 +69,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'com.github.Vizhan:barcodescanner:d51ad89e3ef6e0c4d6fee2d41f3344a06632f269'
+    implementation 'com.github.Vizhan:barcodescanner:d3841a9f9bdc670ff4d3fec6bc8adbb32e6fb342'
     implementation 'com.google.protobuf:protobuf-lite:3.0.1'
     api 'com.google.android.material:material:1.1.0'
 }
