@@ -2,11 +2,11 @@ package de.mintware.barcode_scan
 
 import android.content.Context
 import android.hardware.Camera
-import android.util.Log
+import androidx.annotation.Nullable
 import me.dm7.barcodescanner.core.CameraWrapper
-import me.dm7.barcodescanner.zxing.ZXingScannerView
 
-class ZXingAutofocusScannerView(context: Context) : ZXingScannerView(context) {
+class ZXingAutofocusScannerView constructor(context: Context, @Nullable hint: String) : ZXingScannerView(context, hint) {
+    constructor(context: Context) : this(context, "")
 
     private var callbackFocus = false
     private var autofocusPresence = false
@@ -26,7 +26,7 @@ class ZXingAutofocusScannerView(context: Context) : ZXingScannerView(context) {
 
     override fun setAutoFocus(state: Boolean) {
         //Fix to avoid crash on devices without autofocus (Issue #226)
-        if(autofocusPresence){
+        if (autofocusPresence) {
             super.setAutoFocus(callbackFocus)
         }
     }

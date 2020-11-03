@@ -244,9 +244,12 @@ class _MyAppState extends State<_MyApp> {
     try {
       var options = ScanOptions(
         strings: {
-          "cancel": _cancelController.text,
           "flash_on": _flashOnController.text,
           "flash_off": _flashOffController.text,
+          // ignore: lines_longer_than_80_chars
+          "hint": "Search for the barcode on your book and place it in front of you camera in the selected area.",
+          "title": "Scan barcode",
+          "cancel": "Cancel",
         },
         restrictFormat: selectedFormats,
         useCamera: _selectedCamera,

@@ -3,11 +3,14 @@ package de.mintware.barcode_scan
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
-import me.dm7.barcodescanner.zxing.ZXingScannerView
 
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
@@ -19,8 +22,6 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     private var scannerView: ZXingScannerView? = null
 
     companion object {
-        const val TOGGLE_FLASH = 200
-        const val CANCEL = 300
         const val EXTRA_CONFIG = "config"
         const val EXTRA_RESULT = "scan_result"
         const val EXTRA_ERROR_CODE = "error_code"
@@ -44,7 +45,6 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     // region Activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         config = Protos.Configuration.parseFrom(intent.extras!!.getByteArray(EXTRA_CONFIG))
     }
 
@@ -52,8 +52,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         if (scannerView != null) {
             return
         }
-
-        scannerView = ZXingAutofocusScannerView(this).apply {
+        scannerView = ZXingAutofocusScannerView(this, config.stringsMap["hint"].orEmpty()).apply {
             setAutoFocus(config.android.useAutoFocus)
             val restrictedFormats = mapRestrictedBarcodeTypes()
             if (restrictedFormats.isNotEmpty()) {
@@ -68,36 +67,34 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
             }
         }
 
-        setContentView(scannerView)
-    }
+        val inflater = LayoutInflater.from(this)
+        val view = inflater.inflate(R.layout.camera, null, false) as ConstraintLayout
 
-    // region AppBar menu
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        var buttonText = config.stringsMap["flash_on"]
-        if (scannerView?.flash == true) {
-            buttonText = config.stringsMap["flash_off"]
+        view.findViewById<TextView>(R.id.tvTitle).text = config.stringsMap["title"]
+        view.findViewById<ImageView>(R.id.ivTorch).apply {
+            setOnClickListener {
+                val isTorchOn = scannerView?.flash == true
+                scannerView?.flash = !isTorchOn
+
+                val source = if (!isTorchOn) {
+                    R.drawable.ic_torch_off
+                } else {
+                    R.drawable.ic_torch_on
+                }
+                setImageResource(source)
+            }
         }
-        val flashButton = menu.add(0, TOGGLE_FLASH, 0, buttonText)
-        flashButton.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
 
-        val cancelButton = menu.add(0, CANCEL, 0, config.stringsMap["cancel"])
-        cancelButton.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == TOGGLE_FLASH) {
-            scannerView?.toggleFlash()
-            this.invalidateOptionsMenu()
-            return true
+        view.findViewById<TextView>(R.id.tvCancel).apply {
+            text = config.stringsMap["cancel"]
+            setOnClickListener {
+                setResult(RESULT_CANCELED)
+                finish()
+            }
         }
-        if (item.itemId == CANCEL) {
-            setResult(RESULT_CANCELED)
-            finish()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
+
+        view.addView(scannerView, 0)
+        setContentView(view)
     }
 
     override fun onPause() {
