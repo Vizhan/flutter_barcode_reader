@@ -73,11 +73,34 @@ class BarcodeScannerViewController: UIViewController {
                                   previewView: previewView
       )
     }
-    navigationItem.leftBarButtonItem = UIBarButtonItem(title: config.strings["cancel"],
+    let leftItem = UIBarButtonItem(title: config.strings["cancel"],
                                                         style: .plain,
                                                         target: self,
                                                         action: #selector(cancel)
     )
+    leftItem.setTitleTextAttributes([
+    NSAttributedString.Key.font: UIFont(name: "Helvetica-Bold", size: 15.0)!,
+    NSAttributedString.Key.foregroundColor: UIColor.white],
+    for: .normal)
+    
+    navigationItem.leftBarButtonItem = leftItem
+    
+    title = config.strings["title"]
+    
+    navigationController?.navigationBar.tintColor = UIColor.white
+    navigationController?.navigationBar.titleTextAttributes = [
+    NSAttributedString.Key.font: UIFont(name: "Helvetica-Bold", size: 15.0)!,
+    NSAttributedString.Key.foregroundColor: UIColor.white]
+    
+    navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
+    navigationController?.navigationBar.shadowImage = UIImage()
+    navigationController?.navigationBar.isTranslucent = true
+    navigationController?.view.backgroundColor = UIColor(red: 0.0,
+                               green: 0.0,
+                               blue: 0.0,
+                               alpha: 0.55
+    )
+
     updateToggleFlashButton()
   }
   
@@ -125,6 +148,7 @@ class BarcodeScannerViewController: UIViewController {
     }
     scanRect = ScannerOverlay(frame: bounds)
     if let scanRect = scanRect {
+      scanRect.label.text = config.strings["hint"]
       scanRect.translatesAutoresizingMaskIntoConstraints = false
       scanRect.backgroundColor = UIColor.clear
       view.addSubview(scanRect)
@@ -177,8 +201,9 @@ class BarcodeScannerViewController: UIViewController {
       return
     }
     
-    let buttonText = isFlashOn ? config.strings["flash_off"] : config.strings["flash_on"]
-    navigationItem.rightBarButtonItem = UIBarButtonItem(title: buttonText,
+    let asset = isFlashOn ? "ic_torch_off" : "ic_torch_on"
+    
+    navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: asset),
                                                         style: .plain,
                                                         target: self,
                                                         action: #selector(onToggleFlash)

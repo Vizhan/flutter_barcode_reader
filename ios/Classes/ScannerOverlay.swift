@@ -8,11 +8,14 @@
 import Foundation
 
 class ScannerOverlay: UIView {
+    private let paddingFrame: CGFloat = 20
     private let line: UIView = UIView()
-    
+     
+    let label: UILabel = UILabel()
+   
     private var scanLineRect: CGRect {
         let scanRect = calculateScanRect()
-        let positionY = scanRect.origin.y + (scanRect.size.height / 2)
+        let positionY = (scanRect.origin.y + (scanRect.size.height / 2))
         
         return CGRect(x: scanRect.origin.x,
                       y: positionY,
@@ -25,8 +28,14 @@ class ScannerOverlay: UIView {
         super.init(frame: frame)
         line.backgroundColor = UIColor.red
         line.translatesAutoresizingMaskIntoConstraints = false
-        
         addSubview(line)
+        
+        label.center = center
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.font = UIFont.systemFont(ofSize: 13)
+        label.textColor = UIColor.white
+        addSubview(label)
     }
     
     required init?(coder: NSCoder) {
@@ -54,6 +63,12 @@ class ScannerOverlay: UIView {
         // draw a horizontal line over the middle
         let lineRect = scanLineRect
         line.frame = lineRect
+        
+        //draw a hint
+        let textX = holeRect.origin.x
+        let textY = holeRect.origin.y + holeRect.height / 2 + paddingFrame * 2
+        let textRect = CGRect(x: textX, y: textY, width: holeRect.width, height: holeRect.height)
+        label.frame = textRect
         
         // draw the green corners
         let cornerSize: CGFloat = 30
@@ -103,14 +118,14 @@ class ScannerOverlay: UIView {
     
     private func calculateScanRect() -> CGRect {
         let rect = frame
-        
+    
         let frameWidth = rect.size.width
         var frameHeight = rect.size.height
         
         let isLandscape = frameWidth > frameHeight
         let widthOnPortrait = isLandscape ? frameHeight : frameWidth
-        let scanRectWidth = widthOnPortrait * 0.8
-        let aspectRatio: CGFloat = 3.0 / 4.0
+        let scanRectWidth = widthOnPortrait - paddingFrame * 2
+        let aspectRatio: CGFloat = 0.6
         let scanRectHeight = scanRectWidth * aspectRatio
         
         if isLandscape {
